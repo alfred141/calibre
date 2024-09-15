@@ -1,0 +1,35 @@
+version: "2.1"
+services:
+  calibre:
+    image: linuxserver/calibre:latest
+    container_name: calibre
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Taipei #時區
+      - PASSWORD= abc #自訂密碼，用於連線驗證用，預設帳號為abc
+      - CLI_ARGS=
+      - CUSTOM_PORT=26341
+    volumes:
+      - ./config:/config:rw #calibre設定檔存放位置，可使用現有calibre書庫目錄
+    ports:
+      - 26341:8080 #http通訊埠
+      - 26342:8181 #https通訊埠
+      - 26343:8081 #calibre內建伺服器通訊埠
+    restart: unless-stopped
+
+  calibre-web:
+    image: linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Taipei #時區
+    volumes:
+      - ./config:/config #calibre-web設定檔存放目錄
+      - ./config/calibre_books:/books #calibre書庫目錄，使用現有的calibre書庫
+    ports:
+      - 26344:8083
+    restart: unless-stopped
